@@ -2,6 +2,7 @@ package com.example.icocdemo.ui.activities
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanResult
 import android.content.Context
@@ -33,7 +34,7 @@ import com.example.icocdemo.viewmodels.viewmodelfactory.AppViewModelFactory
 class AddDevicesActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddDevicesBinding
-    private lateinit var bluetoothManager: BluetoothManager
+    private var bluetoothManager: BluetoothManager? = null
     private var sdk: SDK? = null
     private lateinit var viewModel: AddDevicesViewModel
     private lateinit var adapter: BleDeviceAdapter
@@ -145,15 +146,17 @@ class AddDevicesActivity : AppCompatActivity() {
         ) {
             requestPermissions()
         } else {
-            if (!bluetoothManager.adapter.isEnabled) {
-                bluetoothManager.adapter.enable()
-            }
-            if (sdk != null) {
-                if (sdk!!.isScanning) {
-                    sdk!!.stopScan()
+            if (bluetoothManager != null && bluetoothManager?.adapter != null) {
+                if (!bluetoothManager?.adapter?.isEnabled!!) {
+                    bluetoothManager?.adapter?.enable()
                 }
+                if (sdk != null) {
+                    if (sdk!!.isScanning) {
+                        sdk!!.stopScan()
+                    }
+                }
+                startScan()
             }
-            startScan()
         }
     }
 
@@ -253,7 +256,16 @@ class AddDevicesActivity : AppCompatActivity() {
      */
     private fun initSDK() {
         bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        sdk?.initSdk(bluetoothManager.adapter, this)
+        if (bluetoothManager == null || bluetoothManager?.adapter == null) {
+            Toast.makeText(this, "Bluetooth not found in device", Toast.LENGTH_SHORT).show()
+            finish()
+            setResult(Activity.RESULT_CANCELED)
+        } else {
+            if (sdk == null) {
+                sdk = SDK(this)
+            }
+            sdk?.initSdk(bluetoothManager?.adapter, this)
+        }
     }
 
     /**

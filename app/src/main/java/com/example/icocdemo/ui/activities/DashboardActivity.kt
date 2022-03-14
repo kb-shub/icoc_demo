@@ -2,6 +2,7 @@ package com.example.icocdemo.ui.activities
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanResult
 import android.content.Context
@@ -11,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -35,7 +37,7 @@ class DashboardActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDashboardBinding
     private lateinit var viewModel: DashboardViewModel
     private var sdk: SDK? = null
-    private lateinit var bluetoothManager: BluetoothManager
+    private var bluetoothManager: BluetoothManager? = null
     private lateinit var weighMachineAdapter: WeighMachineAdapter
     private lateinit var bpMachineAdapter: BPMachineAdapter
 
@@ -121,15 +123,17 @@ class DashboardActivity : AppCompatActivity() {
         ) {
             requestPermissions()
         } else {
-            if (!bluetoothManager.adapter.isEnabled) {
-                bluetoothManager.adapter.enable()
-            }
-            if (sdk != null) {
-                if (sdk!!.isScanning) {
-                    sdk!!.stopScan()
+            if (bluetoothManager != null && bluetoothManager?.adapter != null) {
+                if (!bluetoothManager?.adapter?.isEnabled!!) {
+                    bluetoothManager?.adapter?.enable()
                 }
+                if (sdk != null) {
+                    if (sdk!!.isScanning) {
+                        sdk!!.stopScan()
+                    }
+                }
+                startScan()
             }
-            startScan()
         }
     }
 
@@ -248,7 +252,16 @@ class DashboardActivity : AppCompatActivity() {
      */
     private fun initSDK() {
         bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        sdk?.initSdk(bluetoothManager.adapter, this)
+        if (bluetoothManager == null || bluetoothManager?.adapter == null) {
+            Toast.makeText(this, "Bluetooth not found in device", Toast.LENGTH_SHORT).show()
+            finish()
+            setResult(Activity.RESULT_CANCELED)
+        } else {
+            if (sdk == null) {
+                sdk = SDK(this)
+            }
+            sdk?.initSdk(bluetoothManager?.adapter, this)
+        }
     }
 
     private var checkSettingsLauncher = registerForActivityResult(
