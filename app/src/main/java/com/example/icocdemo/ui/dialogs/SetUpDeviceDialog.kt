@@ -14,9 +14,12 @@ import com.atollsolutions.icoc_library.SDK
 import com.example.icocdemo.databinding.DialogSetUpDeviceBinding
 import com.example.icocdemo.models.BleDevice
 
-class SetUpDeviceDialog(private val device: BleDevice) : DialogFragment() {
+class SetUpDeviceDialog(
+    private val sdk: SDK,
+    private val device: BleDevice,
+    private val dismissListener: SetUpDeviceListener
+) : DialogFragment() {
 
-    private lateinit var sdk: SDK
     private lateinit var binding: DialogSetUpDeviceBinding
     private lateinit var bluetoothManager: BluetoothManager
 
@@ -36,14 +39,8 @@ class SetUpDeviceDialog(private val device: BleDevice) : DialogFragment() {
             tvDiaSetUpDeviceSetDeviceMacId.text = device.macId
             tvDiaSetUpDeviceSetDeviceMachineType.text = device.bleMachineName
         }
-        sdk = SDK(requireContext())
         initSDK()
         return binding.root
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        sdk.deInit(requireContext())
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -72,7 +69,7 @@ class SetUpDeviceDialog(private val device: BleDevice) : DialogFragment() {
                                 Toast.LENGTH_SHORT
                             ).show()
                             binding.pgDiaSetUpDeviceProgress.isVisible = false
-                            dismiss()
+                            dismissDialog()
                         }
 
                         override fun onExistingNameError(device: Device?) {
@@ -82,7 +79,7 @@ class SetUpDeviceDialog(private val device: BleDevice) : DialogFragment() {
                                 Toast.LENGTH_SHORT
                             ).show()
                             binding.pgDiaSetUpDeviceProgress.isVisible = false
-                            dismiss()
+                            dismissDialog()
                         }
 
                         override fun onExistingDeviceError(device: Device?) {
@@ -92,7 +89,7 @@ class SetUpDeviceDialog(private val device: BleDevice) : DialogFragment() {
                                 Toast.LENGTH_SHORT
                             ).show()
                             binding.pgDiaSetUpDeviceProgress.isVisible = false
-                            dismiss()
+                            dismissDialog()
                         }
 
                         override fun onDeviceSetupError(device: Device?, status: Int) {
@@ -102,11 +99,10 @@ class SetUpDeviceDialog(private val device: BleDevice) : DialogFragment() {
                                 Toast.LENGTH_SHORT
                             ).show()
                             binding.pgDiaSetUpDeviceProgress.isVisible = false
-                            dismiss()
+                            dismissDialog()
                         }
 
-                    });
-
+                    })
             } else {
                 Toast.makeText(
                     requireContext(),
@@ -117,7 +113,7 @@ class SetUpDeviceDialog(private val device: BleDevice) : DialogFragment() {
         }
         binding.mbDiaSetUpDeviceCancel.setOnClickListener {
             if (!binding.pgDiaSetUpDeviceProgress.isVisible) {
-                dialog?.dismiss()
+                dismissDialog()
             } else {
                 Toast.makeText(
                     requireContext(),
@@ -126,5 +122,14 @@ class SetUpDeviceDialog(private val device: BleDevice) : DialogFragment() {
                 ).show()
             }
         }
+    }
+
+    private fun dismissDialog() {
+        dismiss()
+        dismissListener.onDismiss()
+    }
+
+    interface SetUpDeviceListener {
+        fun onDismiss()
     }
 }

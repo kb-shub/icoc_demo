@@ -109,7 +109,6 @@ class DashboardActivity : AppCompatActivity() {
     /**
      * Check if the necessary permissions are given
      */
-    @SuppressLint("MissingPermission")
     private fun checkPermissionAndStartScan() {
         if (!Utils.checkPermissions(
                 this,
@@ -123,17 +122,22 @@ class DashboardActivity : AppCompatActivity() {
         ) {
             requestPermissions()
         } else {
-            if (bluetoothManager != null && bluetoothManager?.adapter != null) {
-                if (!bluetoothManager?.adapter?.isEnabled!!) {
-                    bluetoothManager?.adapter?.enable()
-                }
-                if (sdk != null) {
-                    if (sdk!!.isScanning) {
-                        sdk!!.stopScan()
-                    }
-                }
-                startScan()
+            checkStartScan()
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun checkStartScan() {
+        if (bluetoothManager != null && bluetoothManager?.adapter != null) {
+            if (!bluetoothManager?.adapter?.isEnabled!!) {
+                bluetoothManager?.adapter?.enable()
             }
+            if (sdk != null) {
+                if (sdk!!.isScanning) {
+                    sdk!!.stopScan()
+                }
+            }
+            startScan()
         }
     }
 
@@ -147,10 +151,12 @@ class DashboardActivity : AppCompatActivity() {
                     Manifest.permission.BLUETOOTH,
                     Manifest.permission.BLUETOOTH_ADMIN,
                     Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
                 )
             ) {
                 showReasonDialog()
+            } else {
+                checkStartScan()
             }
         }
 

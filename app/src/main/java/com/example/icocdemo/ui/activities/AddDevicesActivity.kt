@@ -74,7 +74,15 @@ class AddDevicesActivity : AppCompatActivity() {
                             ).show()
                             return
                         }
-                        val setUpDeviceDialog = SetUpDeviceDialog(item)
+                        val setUpDeviceDialog =
+                            SetUpDeviceDialog(
+                                sdk!!,
+                                item,
+                                object : SetUpDeviceDialog.SetUpDeviceListener {
+                                    override fun onDismiss() {
+                                        //initSDK()
+                                    }
+                                })
                         setUpDeviceDialog.show(supportFragmentManager, "")
                     }
                 }
@@ -85,13 +93,6 @@ class AddDevicesActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        if (sdk != null) {
-            sdk!!.stopScan()
-            sdk!!.deInit(this)
-        }
-    }
 
     /**
      * Live data observer to feed data to recyclerview
@@ -146,17 +147,22 @@ class AddDevicesActivity : AppCompatActivity() {
         ) {
             requestPermissions()
         } else {
-            if (bluetoothManager != null && bluetoothManager?.adapter != null) {
-                if (!bluetoothManager?.adapter?.isEnabled!!) {
-                    bluetoothManager?.adapter?.enable()
-                }
-                if (sdk != null) {
-                    if (sdk!!.isScanning) {
-                        sdk!!.stopScan()
-                    }
-                }
-                startScan()
+            checkStartScan()
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun checkStartScan() {
+        if (bluetoothManager != null && bluetoothManager?.adapter != null) {
+            if (!bluetoothManager?.adapter?.isEnabled!!) {
+                bluetoothManager?.adapter?.enable()
             }
+            if (sdk != null) {
+                if (sdk!!.isScanning) {
+                    sdk!!.stopScan()
+                }
+            }
+            startScan()
         }
     }
 
@@ -204,6 +210,8 @@ class AddDevicesActivity : AppCompatActivity() {
                 )
             ) {
                 showReasonDialog()
+            } else {
+                checkStartScan()
             }
         }
 
@@ -291,6 +299,12 @@ class AddDevicesActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        if (sdk != null) {
+            if (sdk!!.isScanning) {
+                sdk!!.stopScan()
+            }
+            sdk!!.deInit(this)
+        }
     }
 
     /**
