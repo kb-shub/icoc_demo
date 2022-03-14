@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.activities.DashboardActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/tb_actDashDevices_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:background="@color/purple_500"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="Dashboard"
+        app:titleTextColor="@color/white" />
+
+
+    <androidx.core.widget.NestedScrollView
+        app:layout_constraintTop_toBottomOf="@+id/tb_actDashDevices_toolbar"
+        android:layout_width="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="0dp">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginVertical="16dp"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/text_body_bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/material_blue_grey_80"
+                android:text="@string/adult_weighing_machine" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_actDashBoard_weighMacs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/text_body_bold"
+                android:textColor="@color/red_btn_bg_color"
+                android:text="@string/no_weighing_machines_found"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_actDashBoard_weighMacs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_weighing_machine" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/text_body_bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/material_blue_grey_80"
+                android:text="@string/blood_pressure" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_actDashBoard_BPMacs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/text_body_bold"
+                android:textColor="@color/red_btn_bg_color"
+                android:text="@string/no_bp_machines_found"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_actDashBoard_bpMacs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_bp_machine" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
