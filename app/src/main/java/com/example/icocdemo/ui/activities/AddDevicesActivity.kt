@@ -84,10 +84,13 @@ class AddDevicesActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Destroy sdk object
-     */
-
+    override fun onStop() {
+        super.onStop()
+        if (sdk != null) {
+            sdk!!.stopScan()
+            sdk!!.deInit(this)
+        }
+    }
 
     /**
      * Live data observer to feed data to recyclerview
@@ -104,6 +107,26 @@ class AddDevicesActivity : AppCompatActivity() {
                 AddDevicesViewModel::class.java
             )
     }
+
+    /*
+    Caused by: java.lang.NullPointerException: Attempt to invoke virtual method ‘void com.atollsolutions.blelibrary.BleHandler.stopBleScan()’ on a null object reference
+        at com.atollsolutions.icoc_library.SDK.stopScan(SDK.java:256)
+        at com.example.icocdemo.ui.activities.AddDevicesActivity.onDestroy(AddDevicesActivity.kt:259)
+        at android.app.Activity.performDestroy(Activity.java:8359)
+        at android.app.Instrumentation.callActivityOnDestroy(Instrumentation.java:1344)
+        at android.app.ActivityThread.performDestroyActivity(ActivityThread.java:5195)
+        at android.app.ActivityThread.handleDestroyActivity(ActivityThread.java:5243)
+        at android.app.servertransaction.DestroyActivityItem.execute(DestroyActivityItem.java:44)
+        at android.app.servertransaction.TransactionExecutor.executeLifecycleState(TransactionExecutor.java:176)
+        at android.app.servertransaction.TransactionExecutor.execute(TransactionExecutor.java:97)
+        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2132)
+        at android.os.Handler.dispatchMessage(Handler.java:106)
+        at android.os.Looper.loop(Looper.java:250)
+        at android.app.ActivityThread.main(ActivityThread.java:7851)
+        at java.lang.reflect.Method.invoke(Native Method)
+        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:592)
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:958)
+     */
 
     /**
      * Check if the necessary permissions are given
@@ -255,10 +278,6 @@ class AddDevicesActivity : AppCompatActivity() {
 
 
     override fun onDestroy() {
-        if (sdk != null) {
-            sdk!!.stopScan()
-            sdk!!.deInit(this)
-        }
         super.onDestroy()
     }
 

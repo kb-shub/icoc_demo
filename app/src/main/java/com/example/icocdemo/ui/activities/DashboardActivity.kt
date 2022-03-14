@@ -62,12 +62,12 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
+    override fun onStop() {
+        super.onStop()
         if (sdk != null) {
             sdk!!.stopScan()
             sdk!!.deInit(this)
         }
-        super.onDestroy()
     }
 
     private fun observeViewModel() {
