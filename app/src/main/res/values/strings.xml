@@ -24,4 +24,7 @@ To enable, click on Permissions > Location and Phone one by one > click on "Allo
     <string name="systolic">Systolic :</string>
     <string name="diastolic">Diastolic :</string>
     <string name="pulse">Pulse :</string>
+    <string name="pulse_monitor">Pulse Monitor</string>
+    <string name="no_oximeters_found">No oximeters found!</string>
+    <string name="spo2">SpO2:</string>
 </resources>

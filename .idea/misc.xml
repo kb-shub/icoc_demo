@@ -5,11 +5,12 @@
       <map>
         <entry key="app/src/main/res/drawable/item_ripple_background.xml" value="0.21" />
         <entry key="app/src/main/res/layout/activity_add_devices.xml" value="0.4036458333333333" />
-        <entry key="app/src/main/res/layout/activity_dashboard.xml" value="0.2667814113597246" />
+        <entry key="app/src/main/res/layout/activity_dashboard.xml" value="0.2573895715709067" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.375" />
         <entry key="app/src/main/res/layout/dialog_set_up_device.xml" value="0.335" />
         <entry key="app/src/main/res/layout/item_bluetooth_device.xml" value="0.4036458333333333" />
         <entry key="app/src/main/res/layout/item_bp_machine.xml" value="0.4036458333333333" />
+        <entry key="app/src/main/res/layout/item_oxi_machine.xml" value="0.4036458333333333" />
         <entry key="app/src/main/res/layout/item_ripple_background.xml" value="0.21822916666666667" />
         <entry key="app/src/main/res/layout/item_weighing_machine.xml" value="0.45" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2125" />

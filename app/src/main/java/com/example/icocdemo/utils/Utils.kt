@@ -5,10 +5,9 @@ import android.content.pm.PackageManager
 import android.location.LocationManager
 import androidx.core.app.ActivityCompat
 import com.example.icocdemo.models.BPMachineValues
+import com.example.icocdemo.models.OxiMachineValues
 
 object Utils {
-    private const val TYPE_WEIGHING_MACHINE = 0
-    private const val TYPE_BLOOD_PRESSURE_MACHINE = 2
     fun checkPermissions(activityContext: Context, vararg permissionStrings: String): Boolean {
         for (permission in permissionStrings) {
             if (ActivityCompat.checkSelfPermission(
@@ -26,23 +25,10 @@ object Utils {
         return if (value != null && value != "" && value != ".") value.toFloat() else "0".toFloat()
     }
 
-    fun getInt(value: String?): Int {
+    private fun getInt(value: String?): Int {
         return if (value != null && value != "" && value != ".") value.toInt() else "0".toInt()
     }
 
-    /*fun getDeviceType(type: Int): String {
-        return when(type){
-            TYPE_WEIGHING_MACHINE ->{
-                "Weighing Machine"
-            }
-            TYPE_BLOOD_PRESSURE_MACHINE ->{
-                "Blood Pressure Machine"
-            }
-            else ->{
-                "Invalid Machine Type"
-            }
-        }
-    }*/
 
     fun checkIfGPSIsOn(activityContext: Context): Boolean {
         val manager = activityContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -50,12 +36,21 @@ object Utils {
     }
 
     /**
-     * Gives BPMachineValues() from a string
+     * Gives BPMachineValues() from a data string
      */
     fun getBpValuesFromDataString(dataString: String): BPMachineValues {
         val systolic = dataString.substringAfter("Systolic: ").substringBefore("\n")
         val diastolic = dataString.substringAfter("Diastolic: ").substringBeforeLast("\n")
         val pulse = dataString.substringAfter("Pulse: ")
         return BPMachineValues(getInt(systolic), getInt(diastolic), getInt(pulse))
+    }
+
+    /**
+     * Gives OxiMachineValues from a data String
+     */
+    fun getOxiValuesFromDataString(dataString: String): OxiMachineValues {
+        val spO2 = dataString.substringAfter("SpO2: ").substringBefore("\n")
+        val pulse = dataString.substringAfter("Pulse: ")
+        return OxiMachineValues(getInt(spO2), getInt(pulse))
     }
 }

@@ -60,6 +60,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/material_blue_grey_80"
                 android:text="@string/blood_pressure" />
+
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_actDashBoard_BPMacs"
                 android:layout_width="match_parent"
@@ -75,6 +76,29 @@
                 android:nestedScrollingEnabled="false"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_bp_machine" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                style="@style/text_body_bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/material_blue_grey_80"
+                android:text="@string/pulse_monitor" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_actDashBoard_oxiMacs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/text_body_bold"
+                android:textColor="@color/red_btn_bg_color"
+                android:text="@string/no_oximeters_found"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_actDashBoard_oxiMacs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_oxi_machine" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.core.widget.NestedScrollView>

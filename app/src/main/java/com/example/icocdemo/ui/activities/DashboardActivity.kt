@@ -24,9 +24,11 @@ import com.atollsolutions.icoc_library.SDK
 import com.cazaea.sweetalert.SweetAlertDialog
 import com.example.icocdemo.R
 import com.example.icocdemo.adapters.BPMachineAdapter
+import com.example.icocdemo.adapters.OxiMachineAdapter
 import com.example.icocdemo.adapters.WeighMachineAdapter
 import com.example.icocdemo.databinding.ActivityDashboardBinding
 import com.example.icocdemo.models.BPMachine
+import com.example.icocdemo.models.OxiMachine
 import com.example.icocdemo.models.WeighMachine
 import com.example.icocdemo.utils.Utils
 import com.example.icocdemo.viewmodels.DashboardViewModel
@@ -40,6 +42,7 @@ class DashboardActivity : AppCompatActivity() {
     private var bluetoothManager: BluetoothManager? = null
     private lateinit var weighMachineAdapter: WeighMachineAdapter
     private lateinit var bpMachineAdapter: BPMachineAdapter
+    private lateinit var oxiMachineAdapter: OxiMachineAdapter
 
     companion object {
         private const val TAG = "DashboardActivity"
@@ -64,8 +67,8 @@ class DashboardActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onDestroy() {
+        super.onDestroy()
         if (sdk != null) {
             sdk!!.stopScan()
             sdk!!.deInit(this)
@@ -83,6 +86,11 @@ class DashboardActivity : AppCompatActivity() {
             bpMachineAdapter.submitList(it)
             bpMachineAdapter.notifyDataSetChanged()
         }
+        viewModel.liveOxiMachines.observe(this) {
+            binding.tvActDashBoardOxiMacs.isVisible = it.isEmpty()
+            oxiMachineAdapter.submitList(it)
+            oxiMachineAdapter.notifyDataSetChanged()
+        }
     }
 
     private fun initUI() {
@@ -99,10 +107,15 @@ class DashboardActivity : AppCompatActivity() {
                 override fun onItemClick(item: BPMachine) {
                     readBPMachineValue(item)
                 }
-
+            })
+            oxiMachineAdapter = OxiMachineAdapter(object : OxiMachineAdapter.SelectionCallBack {
+                override fun onItemClick(item: OxiMachine) {
+                    readOxiMachineValues(item)
+                }
             })
             rvActDashBoardWeighMacs.adapter = weighMachineAdapter
             rvActDashBoardBpMacs.adapter = bpMachineAdapter
+            rvActDashBoardOxiMacs.adapter = oxiMachineAdapter
         }
     }
 
@@ -207,40 +220,93 @@ class DashboardActivity : AppCompatActivity() {
                     setupDeviceDiscoveryMap: HashMap<String, Device>?,
                     scanResultMap: HashMap<String, ScanResult>?
                 ) {
-                    val weighMachineListToLiveData = mutableListOf<WeighMachine>()
-                    val bpMachineListToLiveData = mutableListOf<BPMachine>()
-                    setupDeviceDiscoveryMap?.forEach {
-                        val device = it.value
-                        if (device.dataType == "Adult Weight") {
-                            weighMachineListToLiveData.add(
-                                WeighMachine(
-                                    device.macId,
-                                    device.deviceName,
-                                    null
-                                )
-                            )
-                        } else if (device.dataType == "Blood Pressure") {
-                            bpMachineListToLiveData.add(
-                                BPMachine(
-                                    device.macId,
-                                    device.deviceName,
-                                    null,
-                                    null,
-                                    null
-                                )
-                            )
+                    if (setupDeviceDiscoveryMap != null) {
+                        val weighMachineListToLiveData = mutableListOf<WeighMachine>()
+                        val bpMachineListToLiveData = mutableListOf<BPMachine>()
+                        val oxiMachineListToLiveData = mutableListOf<OxiMachine>()
+                        setupDeviceDiscoveryMap.forEach {
+                            val device = it.value
+                            when (device.dataType) {
+                                "Adult Weight" -> {
+                                    weighMachineListToLiveData.add(
+                                        WeighMachine(
+                                            device.macId,
+                                            device.deviceName,
+                                            null
+                                        )
+                                    )
+                                }
+                                "Blood Pressure" -> {
+                                    bpMachineListToLiveData.add(
+                                        BPMachine(
+                                            device.macId,
+                                            device.deviceName,
+                                            null,
+                                            null,
+                                            null
+                                        )
+                                    )
+                                }
+                                "Pulse Oximetry" -> {
+                                    oxiMachineListToLiveData.add(
+                                        OxiMachine(
+                                            device.macId,
+                                            device.deviceName,
+                                            null,
+                                            null
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                        viewModel.setNewWeighDevices(
+                            weighMachineListToLiveData
+                        )
+                        viewModel.setNewBPDevices(
+                            bpMachineListToLiveData
+                        )
+                        viewModel.setNewOxiDevices(oxiMachineListToLiveData)
+
+                        setupDeviceDiscoveryMap.forEach {
+                            val device = it.value
+                            val oxiMachines = viewModel.liveOxiMachines.value
+                            var listChange = false
+                            oxiMachines?.forEach { oxiMac ->
+                                if (oxiMac.macId == device.macId) {
+                                    if (!oxiMac.isConnected) {
+                                        listChange = true
+                                        oxiMac.isConnected = true
+                                    }
+                                }
+                            }
+                            if (listChange) {
+                                runOnUiThread {
+                                    viewModel.liveOxiMachines.value = oxiMachines
+                                }
+                            }
                         }
                     }
-                    viewModel.setNewWeighDevices(
-                        weighMachineListToLiveData
-                    )
-                    viewModel.setNewBPDevices(
-                        bpMachineListToLiveData
-                    )
                 }
 
                 override fun onSetupDeviceNotDiscovered(setupDeviceNonDiscoveryMap: HashMap<String, Device>?) {
-                    Log.e(TAG, "onSetupDeviceNotDiscovered")
+                    setupDeviceNonDiscoveryMap?.forEach {
+                        val device = it.value
+                        val oxiMachines = viewModel.liveOxiMachines.value
+                        var listChange = false
+                        oxiMachines?.forEach { oxiMac ->
+                            if (oxiMac.macId == device.macId) {
+                                if (oxiMac.isConnected) {
+                                    listChange = true
+                                    oxiMac.isConnected = false
+                                }
+                            }
+                        }
+                        if (listChange) {
+                            runOnUiThread {
+                                viewModel.liveOxiMachines.value = oxiMachines
+                            }
+                        }
+                    }
                 }
 
                 override fun onScanError(errorCode: Int) {
@@ -381,6 +447,35 @@ class DashboardActivity : AppCompatActivity() {
                 override fun onDeviceDisconnected(device: Device?) {
                     Log.e(TAG, "onDeviceDisconnected")
                 }
+
+                override fun onError(device: Device?, error: String?) {
+                    Log.e(TAG, "onError")
+                }
+            })
+    }
+
+    private fun readOxiMachineValues(item: OxiMachine) {
+        sdk?.getData(
+            Device(item.macId, item.deviceName, "Pulse Oximetry"),
+            this,
+            object : DataCallback {
+                override fun onDeviceConnected(device: Device?) {}
+
+                override fun onDataReceived(device: Device?, data: String?) {
+                    val oxiMachines = viewModel.liveOxiMachines.value
+                    oxiMachines?.forEach {
+                        if (it.macId == device?.macId && data != null) {
+                            val bpMachineValues = Utils.getOxiValuesFromDataString(data)
+                            it.spO2 = bpMachineValues.spO2
+                            it.pulse = bpMachineValues.pulse
+                        }
+                    }
+                    runOnUiThread {
+                        viewModel.liveOxiMachines.value = oxiMachines
+                    }
+                }
+
+                override fun onDeviceDisconnected(device: Device?) {}
 
                 override fun onError(device: Device?, error: String?) {
                     Log.e(TAG, "onError")

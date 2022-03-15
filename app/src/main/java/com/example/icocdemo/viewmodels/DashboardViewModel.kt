@@ -3,11 +3,13 @@ package com.example.icocdemo.viewmodels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.icocdemo.models.BPMachine
+import com.example.icocdemo.models.OxiMachine
 import com.example.icocdemo.models.WeighMachine
 
 class DashboardViewModel : ViewModel() {
     val liveWeighMachines = MutableLiveData<MutableList<WeighMachine>>(mutableListOf())
     val liveBPMachines = MutableLiveData<MutableList<BPMachine>>(mutableListOf())
+    val liveOxiMachines = MutableLiveData<MutableList<OxiMachine>>(mutableListOf())
 
     /**
      * Live data list filterer
@@ -34,7 +36,7 @@ class DashboardViewModel : ViewModel() {
 
     fun setNewBPDevices(
         listToLiveData: MutableList<BPMachine>
-    ): MutableList<BPMachine> {
+    ) {
         var listSizeChange = false
         if (liveBPMachines.value!!.isNotEmpty()) {
             liveBPMachines.value?.forEach {
@@ -50,6 +52,23 @@ class DashboardViewModel : ViewModel() {
         if (listSizeChange) {
             liveBPMachines.value = listToLiveData
         }
-        return listToLiveData
+    }
+
+    fun setNewOxiDevices(listToLiveData: MutableList<OxiMachine>) {
+        var listSizeChange = false
+        if (liveOxiMachines.value!!.isNotEmpty()) {
+            liveOxiMachines.value?.forEach {
+                val bleDevice = listToLiveData.find { liveDevice -> liveDevice.macId == it.macId }
+                if (bleDevice == null) {
+                    listSizeChange = true
+                    listToLiveData.add(it)
+                }
+            }
+        } else {
+            listSizeChange = true
+        }
+        if (listSizeChange) {
+            liveOxiMachines.value = listToLiveData
+        }
     }
 }
