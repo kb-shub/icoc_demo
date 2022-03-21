@@ -93,7 +93,6 @@ class AddDevicesActivity : AppCompatActivity() {
         }
     }
 
-
     /**
      * Live data observer to feed data to recyclerview
      */
@@ -109,7 +108,6 @@ class AddDevicesActivity : AppCompatActivity() {
                 AddDevicesViewModel::class.java
             )
     }
-
     /*
     Caused by: java.lang.NullPointerException: Attempt to invoke virtual method ‘void com.atollsolutions.blelibrary.BleHandler.stopBleScan()’ on a null object reference
         at com.atollsolutions.icoc_library.SDK.stopScan(SDK.java:256)
@@ -214,6 +212,7 @@ class AddDevicesActivity : AppCompatActivity() {
                 checkStartScan()
             }
         }
+
 
     /**
      * Dialog for reasoning of asking for permissions
